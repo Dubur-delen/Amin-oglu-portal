@@ -99,7 +99,6 @@
         html5QrCode = new Html5Qrcode("reader");
         html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 },
             (decodedText) => {
-                // Barkodu yakaladı! Şimdi kamerayı durdurup sonucu basalım.
                 html5QrCode.stop().then(() => {
                     document.getElementById('reader').style.display = 'none';
                     document.getElementById('resContainer').style.display = 'block';
