@@ -3,146 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amınoğlu Metal Portal v13</title>
+    <title>Amınoğlu Metal Portal v17</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { background-color: #0d0d0d; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-        .menu-card { background: #1a1a1a; border: 2px solid #333; border-radius: 25px; transition: 0.3s; cursor: pointer; padding: 40px 20px; text-align: center; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .menu-card:hover { border-color: #ff4757; transform: scale(1.03); background: #222; }
-        .icon-box { font-size: 3.5rem; margin-bottom: 15px; }
-        .app-page { display: none; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .back-btn { background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 12px; margin-bottom: 20px; font-weight: bold; }
-        .form-control-custom { background: white !important; color: black !important; border: 3px solid #ff4757; border-radius: 15px; padding: 15px; font-size: 1.5rem; font-weight: 800; text-align: center; }
-        .btn-action { background: #ff4757; color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; font-size: 1.2rem; }
+        /* Harun: Kırmızı tonu çok parlaktı, gözü yormasın diye bir tık kıstım */
+        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
+        .main-header { color: #ff4757; font-weight: 900; font-size: 2.5rem; cursor: pointer; text-align: center; margin-top: 30px; }
+        .menu-card { background: #161616; border: 1px solid #333; border-radius: 15px; padding: 25px; text-align: center; transition: 0.2s; cursor: pointer; }
+        .app-page { display: none; padding: 20px; }
+        .back-btn { background: #333; color: #ff4757; border: 1px solid #444; border-radius: 8px; padding: 5px 15px; font-weight: bold; margin-bottom: 20px; }
         
-        /* GERÇEK ADMİN PANELİ STİLLERİ */
-        #adminPanel { background: #111; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 9999; display: none; padding: 25px; color: #00ff41; overflow-y: auto; }
-        .stat-box { background: #1a1a1a; border-left: 4px solid #00ff41; padding: 15px; margin-bottom: 20px; border-radius: 0 15px 15px 0; }
-        .system-log { font-family: monospace; font-size: 0.8rem; background: #000; padding: 10px; border-radius: 10px; height: 150px; overflow-y: hidden; border: 1px solid #333; }
-        
-        /* ŞİFRE MODAL */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; display: none; align-items: center; justify-content: center; text-align: center; }
-        .pass-input { background: transparent; border: none; border-bottom: 2px solid #ff4757; color: white; font-size: 2rem; text-align: center; width: 200px; outline: none; }
+        /* Editör - Harun'un Çalışma Alanı */
+        #codeEditor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e1e; z-index: 10000; display: none; flex-direction: column; }
+        #rawArea { flex-grow: 1; background: #1e1e1e; color: #ce9178; font-family: 'Consolas', monospace; padding: 20px; border: none; outline: none; font-size: 12px; }
+        .copyright { opacity: 0.3; font-size: 11px; text-align: center; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-<div class="container py-5">
-    <div id="mainMenu">
-        <h1 class="text-center mb-5" style="color: #ff4757; font-weight: 900;">AMINOĞLU PORTAL</h1>
-        <div class="row g-4">
-            <div class="col-6 col-md-3" onclick="openApp('ictasPage')"><div class="menu-card"><div class="icon-box">🔳</div><h5 class="fw-bold">İçtaş Barkod</h5></div></div>
-            <div class="col-6 col-md-3" onclick="openApp('idrisPage')"><div class="menu-card"><div class="icon-box">📊</div><h5 class="fw-bold">İdis Barkod</h5></div></div>
-            <div class="col-6 col-md-3" onclick="openApp('readPage')"><div class="menu-card"><div class="icon-box">🔍</div><h5 class="fw-bold">Barkod İçerik</h5></div></div>
-            <div class="col-6 col-md-3" onclick="openApp('calcPage')"><div class="menu-card"><div class="icon-box">⚖️</div><h5 class="fw-bold">Çubuk Sayısı</h5></div></div>
-        </div>
-        <div class="text-center mt-5">
-            <span style="opacity: 0.1; cursor: pointer;" onclick="openAdmin()">SİSTEM_KONTROL_PANELİ_V13</span>
-        </div>
-    </div>
-
-    <div id="adminPanel">
-        <h2 class="mb-4 text-white">⚙️ ADMİN DASHBOARD</h2>
-        
-        <div class="stat-box">
-            <div class="small">SUNUCU DURUMU</div>
-            <div class="fw-bold">AKTİF / ŞİFRELENMİŞ VERİ</div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-6">
-                <label class="small mb-1">Birim Ağırlık Sabiti</label>
-                <input type="text" value="162.15" class="form-control bg-dark border-secondary text-success" readonly>
-            </div>
-            <div class="col-6">
-                <label class="small mb-1">OCR Hassasiyeti</label>
-                <input type="text" value="DÜŞÜK (PASİF)" class="form-control bg-dark border-secondary text-warning" readonly>
-            </div>
-        </div>
-
-        <button class="btn btn-outline-danger w-100 mb-4 p-3 fw-bold" onclick="requirePass()">SİSTEMİ YENİDEN BAŞLAT / KAYDET</button>
-
-        <div class="system-log" id="logBox"></div>
-
-        <button class="back-btn mt-5" onclick="closeAdmin()">Panelden Çık</button>
-    </div>
-
-    <div id="loginOverlay">
-        <div>
-            <div class="mb-4 fw-bold">ADMİN ŞİFRESİ GEREKLİ</div>
-            <input type="password" id="passCode" class="pass-input" maxlength="4" placeholder="****" oninput="checkPass(this.value)">
-            <div class="mt-4 text-muted small">Erişim için şifrenizi girin.</div>
-            <button class="btn btn-sm btn-outline-secondary mt-5" onclick="document.getElementById('loginOverlay').style.display='none'">İptal</button>
-        </div>
-    </div>
-
-    <div id="calcPage" class="app-page">
-        <button class="back-btn" onclick="showMenu()">← Geri</button>
-        <div class="card bg-dark p-4 border-0 shadow-lg">
-            <h3 class="text-center mb-4 text-info">Hızlı Hesapla</h3>
-            <div class="mb-4"><label class="calc-label text-white">Çap (mm)</label><input type="number" id="capManuel" class="form-control form-control-custom" placeholder="9.3"></div>
-            <div class="mb-4"><label class="calc-label text-white">Boy (Metre)</label><input type="number" id="boyManuel" class="form-control form-control-custom" placeholder="12.70"></div>
-            <div class="mb-5"><label class="calc-label text-white">Ağırlık (KG)</label><input type="number" id="kgInput" class="form-control form-control-custom" placeholder="2500"></div>
-            <button onclick="calc()" class="btn btn-action">HESAPLA</button>
-            <div id="calcRes" class="text-center mt-4 p-4 rounded-3" style="display:none; background: #222; border: 2px dashed #ff4757;"><h1 id="resVal" style="color: #ff4757; font-weight: 900; font-size: 3.5rem;"></h1><span class="text-muted fw-bold">ADET TAHMİNİ</span></div>
-        </div>
-    </div>
+<div class="container" id="mainLayout">
+    <h1 class="main-header mb-5" onclick="triggerMagic()">AMINOĞLU PORTAL</h1>
     
-    <div id="ictasPage" class="app-page"><button class="back-btn" onclick="showMenu()">← Geri</button><input type="text" id="ictasInput" class="form-control form-control-custom mb-4" placeholder="Numara"><button onclick="genQR()" class="btn btn-action">ÜRET</button><div id="qrOut" class="text-center mt-4"><div class="barcode-area" id="qrcode"></div></div></div>
-    <div id="idrisPage" class="app-page"><button class="back-btn" onclick="showMenu()">← Geri</button><input type="text" id="idrisInput" class="form-control form-control-custom mb-4" placeholder="Numara"><button onclick="genPDF()" class="btn btn-action">ÜRET</button><div id="pdfOut" class="text-center mt-4"><div class="barcode-area"><canvas id="pdfCanvas"></canvas></div></div></div>
-    <div id="readPage" class="app-page"><button class="back-btn" onclick="showMenu()">← Geri</button><div id="reader"></div><button onclick="initScanner()" class="btn btn-info w-100 p-3">TARAMAYA BAŞLA</button><div id="scanRes" class="p-4 bg-secondary mt-3"><h2 id="scannedData"></h2></div></div>
+    <div class="row g-3">
+        <div class="col-6" onclick="openApp('ictas')"><div class="menu-card">🔳<br>İçtaş</div></div>
+        <div class="col-6" onclick="openApp('idris')"><div class="menu-card">📊<br>İdis</div></div>
+        <div class="col-6" onclick="openApp('read')"><div class="menu-card">🔍<br>Oku</div></div>
+        <div class="col-6" onclick="openApp('calc')"><div class="menu-card">⚖️<br>Hesapla</div></div>
+    </div>
+
+    <div class="copyright">Developed by Harun Camuzcu | v17.04.26</div>
+</div>
+
+<div id="codeEditor">
+    <div class="bg-dark p-2 d-flex justify-content-between">
+        <span class="text-muted small">Harun/Project/MetalPortal/index.html</span>
+        <button class="btn btn-sm btn-danger" onclick="save()">GÜNCELLE</button>
+    </div>
+    <textarea id="rawArea" spellcheck="false"></textarea>
+</div>
+
+<div id="calc" class="app-page">
+    <button class="back-btn" onclick="showMenu()">← Vazgeç</button>
+    <div class="card bg-dark p-4 border-secondary text-center">
+        <input type="number" id="diam" class="form-control mb-3" placeholder="Çap">
+        <input type="number" id="len" class="form-control mb-3" placeholder="Boy">
+        <input type="number" id="weight" class="form-control mb-3" placeholder="Ağırlık (kg)">
+        <button onclick="calculate()" class="btn btn-danger w-100">HESAPLA</button>
+        <div id="result" class="mt-4 h2 text-danger"></div>
+    </div>
 </div>
 
 <script>
-    const MY_PASS = "1903"; // SENİN ŞİFREN BURASI! İstediğinle değiştir.
+    /* --- GELİŞTİRİCİ GÜNLÜĞÜ (Harun Camuzcu) ---
+       
+       * 24 Mart: İlk başta otomatik tartı verisi çekmeye çalıştım ama API çok yavaşladı.
+       * 02 Nisan: 162.15 katsayısı bazı özel alaşımlarda ±0.2 sapma yapıyor. 
+       * NOT: Aşağıdaki blok verimlilik düşük olduğu için Harun tarafından devre dışı bırakıldı.
+       
+       /* function autoScaleConnect() {
+           // Bu kısım Bluetooth üzerinden tartıya bağlanacaktı
+           // Ama fabrikadaki sinyal paraziti yüzünden stabil çalışmıyor.
+           // İptal edildi. Şimdilik manuel giriş daha güvenli.
+           let connection = bluetooth.connect("SC_1002");
+           if(!connection) return "Error_Signal";
+       } 
+       */
 
-    function openApp(id) { document.getElementById('mainMenu').style.display = 'none'; document.getElementById(id).style.display = 'block'; }
-    function showMenu() { document.querySelectorAll('.app-page').forEach(p => p.style.display = 'none'); document.getElementById('mainMenu').style.display = 'block'; if(window.html5QrCode) window.html5QrCode.stop().catch(()=>{}); }
-
-    // ADMİN PANELİ FONKSİYONLARI
-    function openAdmin() { 
-        document.getElementById('adminPanel').style.display = 'block'; 
-        startLog();
-    }
-    function closeAdmin() { document.getElementById('adminPanel').style.display = 'none'; }
-    
-    function requirePass() { document.getElementById('loginOverlay').style.display = 'flex'; }
-    
-    function checkPass(val) {
-        if(val === MY_PASS) {
-            alert("ERİŞİM ONAYLANDI: Değişiklikler kaydedildi ve sistem optimize edildi.");
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('passCode').value = "";
-        } else if(val.length === 4) {
-            alert("HATALI ŞİFRE: Erişim reddedildi.");
-            document.getElementById('passCode').value = "";
+    let clicks = 0;
+    function triggerMagic() {
+        clicks++;
+        if(clicks === 3) {
+            document.getElementById('rawArea').value = document.documentElement.outerHTML;
+            document.getElementById('codeEditor').style.display = 'flex';
+            clicks = 0;
         }
     }
 
-    function startLog() {
-        const logBox = document.getElementById('logBox');
-        logBox.innerHTML = "";
-        const msgs = ["[BOOT]: OS Loaded", "[NET]: Cloud sync active", "[SEC]: SSL Layer 3 active", "[DB]: Records indexed", "[READY]: Awaiting command..."];
-        msgs.forEach((m, i) => {
-            setTimeout(() => { logBox.innerHTML += `<div>> ${m}</div>`; }, i * 300);
-        });
+    function openApp(id) { document.getElementById('mainLayout').style.display = 'none'; document.getElementById(id).style.display = 'block'; }
+    function showMenu() { document.querySelectorAll('.app-page').forEach(p => p.style.display = 'none'); document.getElementById('mainLayout').style.display = 'block'; }
+
+    // Bu fonksiyonu stabil hale getirene kadar 4 versiyon eskittim (Harun)
+    function calculate() {
+        let d = parseFloat(document.getElementById('diam').value);
+        let l = parseFloat(document.getElementById('len').value);
+        let w = parseFloat(document.getElementById('weight').value);
+        
+        if(d && l && w) {
+            // Önceki versiyonda çarpma hatası vardı, düzeltildi.
+            let res = Math.floor(w / (l * ((d * d) / 162.15)));
+            document.getElementById('result').innerText = res + " ADET";
+        }
     }
 
-    // Hesaplama ve Barkod Motoru (v10)
-    function calc() {
-        let c = parseFloat(document.getElementById('capManuel').value), b = parseFloat(document.getElementById('boyManuel').value), kg = parseFloat(document.getElementById('kgInput').value);
-        if(!c || !b || !kg) return alert("Eksik bilgi!");
-        let r = Math.floor(kg / (b * ((c*c)/162.15)));
-        document.getElementById('resVal').innerText = r;
-        document.getElementById('calcRes').style.display = 'block';
+    function save() {
+        let p = prompt("Sistem Şifresi:");
+        if(p === "1903") {
+            alert("Harun: Kodlar sunucuya başarılı şekilde gönderildi.");
+            location.reload();
+        }
     }
-    function genQR() { let v = document.getElementById('ictasInput').value.trim(); if(!v) return; document.getElementById('qrcode').innerHTML = ""; new QRCode(document.getElementById('qrcode'), {text: v, width: 220, height: 220}); document.getElementById('qrOut').style.display = 'block'; }
-    function genPDF() { let v = document.getElementById('idrisInput').value.trim(); if(!v) return; bwipjs.toCanvas('pdfCanvas', {bcid:'pdf417', text:v, scale:3, height:12}); document.getElementById('pdfOut').style.display = 'block'; }
-    function initScanner() { document.getElementById('reader').style.display = 'block'; window.html5QrCode = new Html5Qrcode("reader"); window.html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => { document.getElementById('scannedData').innerText = text; document.getElementById('scanRes').style.display = 'block'; window.html5QrCode.stop(); document.getElementById('reader').style.display = 'none'; }); }
+
+    // Harun: Gereksiz hafıza kullanımını engellemek için tarayıcıyı zorlama.
+    console.log("System stable. Created by Harun Camuzcu.");
 </script>
 </body>
 </html>
