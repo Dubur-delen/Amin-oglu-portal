@@ -15,6 +15,15 @@
         .back-btn { background: #222; color: #ff4757; border: 1px solid #444; padding: 8px 15px; border-radius: 8px; margin-bottom: 25px; }
         #codeEditor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e1e; z-index: 10000; display: none; flex-direction: column; }
         #rawArea { flex-grow: 1; background: #1e1e1e; color: #d4d4d4; font-family: monospace; padding: 15px; border: none; outline: none; font-size: 11px; }
+        
+        /* BARKOD DÜZELTME BURADA: Beyaz zemin ekledik */
+        #idrisOut, #ictasOut img { 
+            background: white !important; 
+            padding: 10px; 
+            border-radius: 4px; 
+            display: block; 
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -32,7 +41,7 @@
 <div id="codeEditor">
     <div class="bg-dark p-2 d-flex justify-content-between border-bottom border-secondary">
         <span class="text-muted small">index.html - Source</span>
-        </div>
+    </div>
     <textarea id="rawArea" spellcheck="false"></textarea>
 </div>
 
@@ -50,7 +59,9 @@
     <div class="card bg-dark p-4 border-secondary text-center">
         <input type="text" id="idrisIn" class="form-control mb-3" placeholder="Barkod Numarası Girin">
         <button class="btn btn-danger w-100" onclick="genIdris()">PDF417 ÜRET</button>
-        <canvas id="idrisOut" class="mt-4 w-100"></canvas>
+        <div class="mt-4" style="overflow-x: auto;">
+            <canvas id="idrisOut"></canvas>
+        </div>
     </div>
 </div>
 
@@ -76,7 +87,6 @@
     }
 
     function processGalleryImage(file) {
-        
         // Tesseract.recognize(file).then(({ data: { text } }) => { console.log(text); });
     } */
 
@@ -104,10 +114,36 @@
         }
     }
 
-    function genIctas() { let v = document.getElementById('ictasIn').value; document.getElementById('ictasOut').innerHTML = ""; new QRCode(document.getElementById('ictasOut'), v); }
-    function genIdris() { let v = document.getElementById('idrisIn').value; bwipjs.toCanvas('idrisOut', { bcid: 'pdf417', text: v, scale: 3, height: 12 }); }
-
+    function genIctas() { 
+        let v = document.getElementById('ictasIn').value; 
+        document.getElementById('ictasOut').innerHTML = ""; 
+        new QRCode(document.getElementById('ictasOut'), {
+            text: v,
+            width: 200,
+            height: 200,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        }); 
+    }
     
+    function genIdris() { 
+        let v = document.getElementById('idrisIn').value; 
+        try {
+            bwipjs.toCanvas('idrisOut', {
+                bcid: 'pdf417',
+                text: v,
+                scale: 3,
+                height: 12,
+                includetext: true,
+                textxalign: 'center',
+                backgroundcolor: 'ffffff' // Kütüphane içinden de beyaz yapalım işi sağlama alalım
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     // Copyrigh Harun Camuzcu
 </script>
 </body>
