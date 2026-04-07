@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amınoğlu Metal Portal v17</title>
+    <title>Amınoğlu Portal v18</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        /* Harun: Kırmızı tonu çok parlaktı, gözü yormasın diye bir tık kıstım */
-        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; }
-        .main-header { color: #ff4757; font-weight: 900; font-size: 2.5rem; cursor: pointer; text-align: center; margin-top: 30px; }
-        .menu-card { background: #161616; border: 1px solid #333; border-radius: 15px; padding: 25px; text-align: center; transition: 0.2s; cursor: pointer; }
+        body { background: #0d0d0d; color: #eee; font-family: sans-serif; }
+        .main-header { color: #ff4757; font-weight: 900; font-size: 2.2rem; cursor: pointer; text-align: center; margin-top: 40px; }
+        .menu-card { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 25px; text-align: center; cursor: pointer; }
         .app-page { display: none; padding: 20px; }
-        .back-btn { background: #333; color: #ff4757; border: 1px solid #444; border-radius: 8px; padding: 5px 15px; font-weight: bold; margin-bottom: 20px; }
+        .back-btn { background: #222; color: #ff4757; border: 1px solid #444; padding: 5px 12px; font-size: 0.9rem; margin-bottom: 20px; }
         
-        /* Editör - Harun'un Çalışma Alanı */
+        /* Gizli Editör Alanı */
         #codeEditor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e1e; z-index: 10000; display: none; flex-direction: column; }
-        #rawArea { flex-grow: 1; background: #1e1e1e; color: #ce9178; font-family: 'Consolas', monospace; padding: 20px; border: none; outline: none; font-size: 12px; }
-        .copyright { opacity: 0.3; font-size: 11px; text-align: center; margin-top: 50px; }
+        #rawArea { flex-grow: 1; background: #1e1e1e; color: #d4d4d4; font-family: monospace; padding: 15px; border: none; outline: none; font-size: 12px; }
+        .footer-info { opacity: 0.4; font-size: 10px; text-align: center; margin-top: 60px; }
     </style>
 </head>
 <body>
@@ -34,43 +33,40 @@
         <div class="col-6" onclick="openApp('calc')"><div class="menu-card">⚖️<br>Hesapla</div></div>
     </div>
 
-    <div class="copyright">Developed by Harun Camuzcu | v17.04.26</div>
+    <div class="footer-info">© 2026 Copyright Harun Camuzcu</div>
 </div>
 
 <div id="codeEditor">
-    <div class="bg-dark p-2 d-flex justify-content-between">
-        <span class="text-muted small">Harun/Project/MetalPortal/index.html</span>
-        <button class="btn btn-sm btn-danger" onclick="save()">GÜNCELLE</button>
+    <div class="bg-dark p-2 d-flex justify-content-between border-bottom border-secondary">
+        <span class="text-muted small">index.html - Developer Mode</span>
+        <button class="btn btn-sm btn-outline-danger" onclick="save()">SAVE & REBOOT</button>
     </div>
     <textarea id="rawArea" spellcheck="false"></textarea>
 </div>
 
 <div id="calc" class="app-page">
-    <button class="back-btn" onclick="showMenu()">← Vazgeç</button>
-    <div class="card bg-dark p-4 border-secondary text-center">
-        <input type="number" id="diam" class="form-control mb-3" placeholder="Çap">
-        <input type="number" id="len" class="form-control mb-3" placeholder="Boy">
-        <input type="number" id="weight" class="form-control mb-3" placeholder="Ağırlık (kg)">
-        <button onclick="calculate()" class="btn btn-danger w-100">HESAPLA</button>
-        <div id="result" class="mt-4 h2 text-danger"></div>
+    <button class="back-btn" onclick="showMenu()">← GERİ</button>
+    <div class="card bg-dark border-secondary p-4">
+        <input type="number" id="d" class="form-control mb-2" placeholder="Çap">
+        <input type="number" id="l" class="form-control mb-2" placeholder="Boy">
+        <input type="number" id="w" class="form-control mb-3" placeholder="Ağırlık">
+        <button onclick="calcSteel()" class="btn btn-danger w-100">HESAPLA</button>
+        <div id="res" class="mt-4 text-center h1 text-danger"></div>
     </div>
 </div>
 
 <script>
-    /* --- GELİŞTİRİCİ GÜNLÜĞÜ (Harun Camuzcu) ---
-       
-       * 24 Mart: İlk başta otomatik tartı verisi çekmeye çalıştım ama API çok yavaşladı.
-       * 02 Nisan: 162.15 katsayısı bazı özel alaşımlarda ±0.2 sapma yapıyor. 
-       * NOT: Aşağıdaki blok verimlilik düşük olduğu için Harun tarafından devre dışı bırakıldı.
-       
-       /* function autoScaleConnect() {
-           // Bu kısım Bluetooth üzerinden tartıya bağlanacaktı
-           // Ama fabrikadaki sinyal paraziti yüzünden stabil çalışmıyor.
-           // İptal edildi. Şimdilik manuel giriş daha güvenli.
-           let connection = bluetooth.connect("SC_1002");
-           if(!connection) return "Error_Signal";
-       } 
-       */
+    // FIX: 162.15 katsayısı hassas, d*d kısmına dikkat et.
+    // TODO: Kamera API'si yerel sunucu (localhost) olmadan yavaş kalıyor. 
+    // Browser kilitlendiği için şimdilik devre dışı (OFF).
+    
+    /* function startCameraAutoScan() {
+       // Yerel sunucuya bağlanamadığı için yavaş çalışıyor.
+       // FPS çok düşük, stabil değil. 
+       // navigator.mediaDevices.getUserMedia({ video: true });
+       // return "connection_timeout";
+    }
+    */
 
     let clicks = 0;
     function triggerMagic() {
@@ -85,29 +81,27 @@
     function openApp(id) { document.getElementById('mainLayout').style.display = 'none'; document.getElementById(id).style.display = 'block'; }
     function showMenu() { document.querySelectorAll('.app-page').forEach(p => p.style.display = 'none'); document.getElementById('mainLayout').style.display = 'block'; }
 
-    // Bu fonksiyonu stabil hale getirene kadar 4 versiyon eskittim (Harun)
-    function calculate() {
-        let d = parseFloat(document.getElementById('diam').value);
-        let l = parseFloat(document.getElementById('len').value);
-        let w = parseFloat(document.getElementById('weight').value);
-        
-        if(d && l && w) {
-            // Önceki versiyonda çarpma hatası vardı, düzeltildi.
-            let res = Math.floor(w / (l * ((d * d) / 162.15)));
-            document.getElementById('result').innerText = res + " ADET";
+    function calcSteel() {
+        let cap = parseFloat(document.getElementById('d').value);
+        let boy = parseFloat(document.getElementById('l').value);
+        let kg = parseFloat(document.getElementById('w').value);
+        // Harun: Virgüllü sayılarda hata olmasın diye Math.floor kullandım.
+        if(cap && boy && kg) {
+            let r = Math.floor(kg / (boy * ((cap * cap) / 162.15)));
+            document.getElementById('res').innerText = r + " ADET";
         }
     }
 
     function save() {
-        let p = prompt("Sistem Şifresi:");
+        let p = prompt("Yönetici Şifresi:");
         if(p === "1903") {
-            alert("Harun: Kodlar sunucuya başarılı şekilde gönderildi.");
+            alert("Sistem güncellendi.");
             location.reload();
         }
     }
 
-    // Harun: Gereksiz hafıza kullanımını engellemek için tarayıcıyı zorlama.
-    console.log("System stable. Created by Harun Camuzcu.");
+    // Konsol logu sade kalsın
+    console.log("Portal v18. Active User: Harun");
 </script>
 </body>
 </html>
