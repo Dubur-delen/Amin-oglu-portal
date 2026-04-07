@@ -16,7 +16,6 @@
         #codeEditor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e1e; z-index: 10000; display: none; flex-direction: column; }
         #rawArea { flex-grow: 1; background: #1e1e1e; color: #d4d4d4; font-family: monospace; padding: 15px; border: none; outline: none; font-size: 11px; }
         
-        /* BARKOD DÜZELTME BURADA: Beyaz zemin ekledik */
         #idrisOut, #ictasOut img { 
             background: white !important; 
             padding: 10px; 
@@ -137,7 +136,7 @@
                 height: 12,
                 includetext: true,
                 textxalign: 'center',
-                backgroundcolor: 'ffffff' // Kütüphane içinden de beyaz yapalım işi sağlama alalım
+                backgroundcolor: 'ffffff' 
             });
         } catch (e) {
             console.error(e);
